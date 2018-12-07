@@ -66,6 +66,10 @@
             opacity: 1;
             transition: all 0.5s linear;
         }
+        #video-time {
+            color: white;
+            font-size: 20px;
+        }
     </style>
 </head>
 <body>
@@ -77,6 +81,7 @@
             <i id="forward" class="fas fa-redo"></i>
         </div>
         <div id="controls-bar">
+            <span id="video-time"><span id="current-time"></span> / <span id="video-duration"></span></span>
         </div>
     </div>
     <script>
@@ -117,6 +122,22 @@
                         video.currentTime += 10;
                         break;
                 }
+            });
+
+            const currentTime = document.getElementById("current-time");
+            const videoDuration = document.getElementById("video-duration");
+            function zeroPrefix(num) {return num % 10 == num ? "0"+num : num}
+            function timeFormat(time) {
+                const hr = zeroPrefix(parseInt(time/3600));
+                const min = zeroPrefix(parseInt((time%3600)/60));
+                const sec = zeroPrefix(parseInt(time%60));
+                return `${hr}:${min}:${sec}`;
+            }
+            currentTime.innerHTML = timeFormat(video.currentTime);
+            videoDuration.innerHTML = timeFormat(video.duration);
+            video.addEventListener("timeupdate", function () {
+                currentTime.innerHTML = timeFormat(video.currentTime);
+                videoDuration.innerHTML = timeFormat(video.duration);
             });
         }
     </script>
