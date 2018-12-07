@@ -170,11 +170,22 @@
             });
             video.addEventListener("timeupdate", function () {
                 currentTime.innerHTML = timeFormat(video.currentTime);
+                seekBar.value = (video.currentTime * 100) / video.duration;
             });
             
             const seekBar = document.getElementById("seek-bar");
             seekBar.addEventListener("change", function () {
-                video.currentTime =  video.duration * (seekBar.value / 100);
+                video.currentTime =  (video.duration * seekBar.value) / 100;
+            });
+            seekBar.addEventListener("mousedown", function () {
+                video.pause();
+                playPause.classList.add("fa-play-circle");
+                playPause.classList.remove("fa-pause-circle");
+            });
+            seekBar.addEventListener("mouseup", function () {
+                video.play();
+                playPause.classList.remove("fa-play-circle");
+                playPause.classList.add("fa-pause-circle");
             });
         }
     </script>
