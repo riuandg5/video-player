@@ -28,11 +28,76 @@
             max-width: 177.78vh;
             max-height: 100vh;
         }
+        #play-pause {
+            position: absolute;
+            top: 40%;
+            left: 45.825%;
+            font-size: 7em;
+            color: white;
+        }
+        #backward {
+            position: absolute;
+            top: 43.5%;
+            left: 35.175%;
+            font-size: 4em;
+            color: rgba(255,255,255,0.8);
+        }
+        #forward {
+            position: absolute;
+            top: 43.5%;
+            left: 60%;
+            font-size: 4em;
+            color: rgba(255,255,255,0.8);
+        }
     </style>
 </head>
 <body>
     <div id="figure">
-        <video id="video" controls poster autoplay></video>
+        <video id="video" poster autoplay></video>
+        <i id="play-pause" class="far fa-pause-circle"></i>
+        <i id="backward" class="fas fa-undo"></i>
+        <i id="forward" class="fas fa-redo"></i>
     </div>
+    <script>
+        window.onload = function () {
+            const video = document.getElementById("video");
+
+            const playPause = document.getElementById("play-pause");
+            playPause.addEventListener("click", function () {
+                if (video.paused == true) {
+                    video.play();
+                    playPause.classList.remove("fa-play-circle");
+                    playPause.classList.add("fa-pause-circle");
+                } else {
+                    video.pause();
+                    playPause.classList.add("fa-play-circle");
+                    playPause.classList.remove("fa-pause-circle");
+                }
+            });
+
+            const backward = document.getElementById("backward");
+            const forward = document.getElementById("forward");
+            backward.addEventListener("click", function () {
+                video.currentTime -= 10;
+            });
+            forward.addEventListener("click", function () {
+                video.currentTime += 10;
+            });
+
+            document.addEventListener('keydown', function (e) {
+                switch (e.keyCode) {
+                    case 32:
+                        playPause.click();
+                        break;
+                    case 37:
+                        video.currentTime -= 10;
+                        break;
+                    case 39:
+                        video.currentTime += 10;
+                        break;
+                }
+            });
+        }
+    </script>
 </body>
 </html>
