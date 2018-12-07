@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=1024px">
+	<meta name="viewport" content="width=1024">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Video Player</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -22,12 +22,21 @@
         #figure {
             position: relative;
         }
-        #figure, #video, #controls-mid {
+        #figure, #video, #controls-mid, #controls-bar {
             margin: 0 auto;
             width: 100vw;
             height: 56.25vw;
             max-width: 177.78vh;
             max-height: 100vh;
+        }
+        #controls-bar {
+            opacity: 0;
+            transition: all 0.5s linear;
+            position: absolute;
+            top: 87%;
+            height: 80px;
+            max-height: none;
+            padding: 0.8em 2em;
         }
         #controls-mid {
             opacity: 0;
@@ -53,7 +62,7 @@
             vertical-align: 15px;
             color: rgba(255,255,255,0.8);
         }
-        #figure:hover #controls-mid {
+        #figure:hover #controls-mid, #figure:hover #controls-bar {
             opacity: 1;
             transition: all 0.5s linear;
         }
@@ -66,6 +75,8 @@
             <i id="backward" class="fas fa-undo"></i>
             <i id="play-pause" class="far fa-play-circle"></i>
             <i id="forward" class="fas fa-redo"></i>
+        </div>
+        <div id="controls-bar">
         </div>
     </div>
     <script>
