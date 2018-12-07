@@ -22,41 +22,38 @@
         #figure {
             position: relative;
         }
-        #figure, #video{
+        #figure, #video, #controls-mid {
             margin: 0 auto;
             width: 100vw;
             height: 56.25vw;
             max-width: 177.78vh;
             max-height: 100vh;
         }
-        #play-pause {
+        #controls-mid {
             opacity: 0;
             transition: all 0.5s linear;
             position: absolute;
             top: 40%;
-            left: 45.825%;
-            font-size: 7em;
+            height: 7em;
+            max-height: none;
+            text-align: center;
             color: white;
         }
+        #play-pause {
+            font-size: 7em;
+            margin: 0 0.8em;
+        }
         #backward {
-            opacity: 0;
-            transition: all 0.5s linear;
-            position: absolute;
-            top: 43.5%;
-            left: 35.175%;
             font-size: 4em;
+            vertical-align: 15px;
             color: rgba(255,255,255,0.8);
         }
         #forward {
-            opacity: 0;
-            transition: all 0.5s linear;
-            position: absolute;
-            top: 43.5%;
-            left: 60%;
             font-size: 4em;
+            vertical-align: 15px;
             color: rgba(255,255,255,0.8);
         }
-        #figure:hover #play-pause, #figure:hover #forward, #figure:hover #backward {
+        #figure:hover #controls-mid {
             opacity: 1;
             transition: all 0.5s linear;
         }
@@ -65,9 +62,11 @@
 <body>
     <div id="figure">
         <video id="video" src="http://iandevlin.github.io/mdn/video-player/video/tears-of-steel-battle-clip-medium.mp4" poster></video>
-        <i id="play-pause" class="far fa-play-circle"></i>
-        <i id="backward" class="fas fa-undo"></i>
-        <i id="forward" class="fas fa-redo"></i>
+        <div id="controls-mid">
+            <i id="backward" class="fas fa-undo"></i>
+            <i id="play-pause" class="far fa-play-circle"></i>
+            <i id="forward" class="fas fa-redo"></i>
+        </div>
     </div>
     <script>
         window.onload = function () {
