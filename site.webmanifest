@@ -1,9 +1,0 @@
-{
-    "name": "Video Player",
-    "short_name": "Video Player",
-    "theme_color": "#000000",
-    "background_color": "#000000",
-    "start_url": "https://riuandg5.github.io/video-player/",
-    "display": "standalone",
-    "orientation": "landscape"
-}
