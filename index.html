@@ -165,9 +165,11 @@
             }
             currentTime.innerHTML = timeFormat(video.currentTime);
             videoDuration.innerHTML = timeFormat(video.duration);
+            video.addEventListener('durationchange', function () {
+                videoDuration.innerHTML = timeFormat(video.duration);
+            });
             video.addEventListener("timeupdate", function () {
                 currentTime.innerHTML = timeFormat(video.currentTime);
-                videoDuration.innerHTML = timeFormat(video.duration);
             });
             
             const seekBar = document.getElementById("seek-bar");
