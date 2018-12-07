@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Video Player</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
     <style>
         * {
             margin: 0;
@@ -29,6 +30,8 @@
             max-height: 100vh;
         }
         #play-pause {
+            opacity: 0;
+            transition: all 0.5s linear;
             position: absolute;
             top: 40%;
             left: 45.825%;
@@ -36,6 +39,8 @@
             color: white;
         }
         #backward {
+            opacity: 0;
+            transition: all 0.5s linear;
             position: absolute;
             top: 43.5%;
             left: 35.175%;
@@ -43,18 +48,24 @@
             color: rgba(255,255,255,0.8);
         }
         #forward {
+            opacity: 0;
+            transition: all 0.5s linear;
             position: absolute;
             top: 43.5%;
             left: 60%;
             font-size: 4em;
             color: rgba(255,255,255,0.8);
         }
+        #figure:hover #play-pause, #figure:hover #forward, #figure:hover #backward {
+            opacity: 1;
+            transition: all 0.5s linear;
+        }
     </style>
 </head>
 <body>
     <div id="figure">
-        <video id="video" poster autoplay></video>
-        <i id="play-pause" class="far fa-pause-circle"></i>
+        <video id="video" src="http://iandevlin.github.io/mdn/video-player/video/tears-of-steel-battle-clip-medium.mp4" poster></video>
+        <i id="play-pause" class="far fa-play-circle"></i>
         <i id="backward" class="fas fa-undo"></i>
         <i id="forward" class="fas fa-redo"></i>
     </div>
