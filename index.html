@@ -74,9 +74,6 @@
             font-size: 25px;
             color: white;
         }
-        #volume:hover {  
-            padding-right: 15px;
-        }
         #mute-unmute {
             width: 25px;
             vertical-align: -0.5px;
@@ -96,16 +93,9 @@
         }
         #volume-bar {
             width: 0;
-            opacity: 0;
-            transition: all 0.2s;
             height: 4px;
             border-radius: 2px;
             vertical-align: 7px;
-        }
-        #volume:hover #volume-bar {
-            width: 100px;
-            opacity: 1;
-            transition: all 0.2s;
         }
         #seek-bar {
             width: 100%;
@@ -135,6 +125,59 @@
             color: white;
             transform: rotate(45deg);
             cursor: pointer;
+            margin-left: 15px;
+        }
+        #playback-speed {
+            display: inline-block;
+            position: relative;
+            width: 55px;
+            height: 25px;
+            text-align: center;
+            border: 1px solid white;
+            vertical-align: -4px;
+            cursor: pointer;
+            margin-left: 15px;
+        }
+        #current-speed {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 55px;
+            height: 25px;
+            font-size: 20px;
+            line-height: 1.1;
+            color: white;
+        }
+        #speed-options {
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.5s;
+            position: absolute;
+            top: -242px;
+            left: -1px;
+            width: 55px;
+            height: 242px;
+            border: 1px solid white;
+        }
+        #playback-speed:hover #speed-options {
+            visibility: visible;
+            opacity: 1;
+            transition: all 0.5s;
+        }
+        .speed {
+            height: 30px;
+            font-size: 20px;
+            line-height: 1.5;
+            color: white;
+        }
+        .speed:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+        .speed:not(:last-child) {
+            border-bottom: 1px solid white;
+        }
+        #right-control {
+            float: right;
         }
     </style>
 </head>
@@ -148,8 +191,23 @@
         </div>
         <div id="controls-bar">
             <span id="video-time"><span id="current-time"></span> / <span id="video-duration"></span></span>
-            <span id="volume"><i id="mute-unmute" class="fas fa-volume-up"></i><input type="range" id="volume-bar" min="0" max="1" step="0.1" value="1"></span>
-            <i id="fullscreen" class="fas fa-arrows-alt"></i>
+            <span id="right-control">
+                <span id="volume"><i id="mute-unmute" class="fas fa-volume-up"></i><input type="range" id="volume-bar" min="0" max="1" step="0.1" value="1"></span>
+                <i id="fullscreen" class="fas fa-arrows-alt"></i>
+                <div id="playback-speed">
+                        <div id="current-speed">1x</div>
+                        <div id="speed-options">
+                            <p class="speed">3x</p>
+                            <p class="speed">2.5x</p>
+                            <p class="speed">2x</p>
+                            <p class="speed">1.5x</p>
+                            <p class="speed">1x</p>
+                            <p class="speed">0.75x</p>
+                            <p class="speed">0.50x</p>
+                            <p class="speed">0.25x</p>
+                        </div>
+                </div>
+            </span>
             <input type="range" id="seek-bar" value="0" step="0.5">
         </div>
     </div>
@@ -287,6 +345,15 @@
                 } else if (video.webkitRequestFullscreen) {
                     video.webkitRequestFullscreen();
                 }
+            });
+
+            const currentSpeed = document.getElementById("current-speed");
+            const speedOptions = document.getElementsByClassName("speed");
+            [...speedOptions].forEach(function (speed) {
+                speed.addEventListener("click", function () {
+                    video.playbackRate = Number((this.textContent).replace(/^\D+|\D+$/g, ""));
+                    currentSpeed.innerHTML = this.textContent;
+                });
             });
         }
     </script>
