@@ -129,6 +129,13 @@
             width: 22px;
             height: 22px;
         }
+        #fullscreen {
+            font-size: 25px;
+            vertical-align: -0.5px;
+            color: white;
+            transform: rotate(45deg);
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -142,6 +149,7 @@
         <div id="controls-bar">
             <span id="video-time"><span id="current-time"></span> / <span id="video-duration"></span></span>
             <span id="volume"><i id="mute-unmute" class="fas fa-volume-up"></i><input type="range" id="volume-bar" min="0" max="1" step="0.1" value="1"></span>
+            <i id="fullscreen" class="fas fa-arrows-alt"></i>
             <input type="range" id="seek-bar" value="0" step="0.5">
         </div>
     </div>
@@ -268,6 +276,17 @@
             volumeBar.addEventListener("change", function () {
                 video.volume = volumeBar.value;
                 changeVolumeIcon(volumeBar.value);
+            });
+
+            const fullscreen = document.getElementById("fullscreen");
+            fullscreen.addEventListener("click", function () {
+                if (video.requestFullscreen) {
+                    video.requestFullscreen();
+                } else if (video.mozRequestFullScreen) {
+                    video.mozRequestFullScreen();
+                } else if (video.webkitRequestFullscreen) {
+                    video.webkitRequestFullscreen();
+                }
             });
         }
     </script>
