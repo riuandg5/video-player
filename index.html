@@ -7,17 +7,22 @@
     <title>Video Player</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
     <style>
+        @import url('https://fonts.googleapis.com/css?family=Montserrat');
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
         }
         body {
             width: 100vw;
             height: 100vh;
             overflow: hidden;
             background-color: black;
+        }
+        i {
+            cursor: pointer;
         }
         #figure {
             position: relative;
@@ -68,7 +73,7 @@
         }
         #video-time {
             color: white;
-            font-size: 20px;
+            font-size: 25px;
         }
         #volume {
             font-size: 25px;
@@ -179,11 +184,131 @@
         #right-control {
             float: right;
         }
+        .menu {
+            position: absolute;
+            top: 0;
+            z-index: 10;
+            width: 25%;
+            height: 56.25vw;
+            max-height: 100vh;
+            padding: 20px;
+            background-color: rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: all 0.5s;
+        }
+        .menu:hover {
+            opacity: 1;
+            transition: all 0.5s;
+        }
+        #menu-right {
+            right: -24.5%;
+            transition: all 0.5s;
+            padding-right: 15px;
+            display: flex;
+            flex-direction: column;
+            color: white;
+        }
+        #menu-right:hover {
+            right: 0;
+        }
+        #inputs {
+            width: 100%;
+            font-size: 35px;
+            line-height: 1;
+            display: flex;
+            padding-bottom: 20px;
+        }
+        #url-form {
+            flex-grow: 1;
+        }
+        #url-input {
+            width: 100%;
+            height: 35px;
+            vertical-align: 6.8px;
+            font-size: 18px;
+            padding: 0 15px;
+            outline: none;
+            border: 2px solid white;
+            border-radius: 17.5px;
+            background-color: transparent;
+            color: white;
+        }
+        #url-input::placeholder {
+            color:rgba(255,255,255,0.8);
+        }
+        #slash {
+            padding: 0 8px;
+            font-weight: bold;
+        }
+        #file-input {
+            display: none;
+        }
+        #playlist {
+            flex-grow: 1;
+            list-style: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        #playlist::-webkit-scrollbar{
+            width: 6px;
+        }
+        #playlist::-webkit-scrollbar-thumb{
+            background-color: rgba(255,255,255,0.5);
+            border-radius: 3px;
+        }
+        .list-item {
+            display: flex;
+            height: 46px;
+            margin-top: 0px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            padding: 5px 0;
+            padding-right: 10px;
+            margin-right: 5px;
+        }
+        .list-item:first-child {
+            height: 45px;
+            border: none;
+        }
+        .list-item:hover {
+            border-color: transparent;
+            background-color: rgba(255,255,255,0.3);
+        }
+        .item-index {
+            flex: 0 0 50px;
+            text-align: center;
+            font-size: 20px;
+            line-height: 1.75;
+            color: rgba(255,255,255,0.8);
+        }
+        .item-index i {
+            font-size: 30px;
+            vertical-align: -5px;
+            color: white;
+        }
+        .item-index .hidden {
+            display: none;
+        }
+        .item-name {
+            flex: 1 0;
+            overflow: hidden;
+            white-space: nowrap;
+            font-size: 20px;
+            line-height: 1.75;
+        }
+        #playlist-options {
+            width: 100%;
+            font-size: 35px;
+            line-height: 1;
+            text-align: center;
+            letter-spacing: 10px;
+            padding-top: 20px;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div id="figure">
-        <video id="video" src="http://iandevlin.github.io/mdn/video-player/video/tears-of-steel-battle-clip-medium.mp4" poster></video>
+        <video id="video" poster></video>
         <div id="controls-mid">
             <i id="backward" class="fas fa-undo"></i>
             <i id="play-pause" class="far fa-play-circle"></i>
@@ -211,32 +336,93 @@
             <input type="range" id="seek-bar" value="0" step="0.5">
         </div>
     </div>
+    <div class="menu" id="menu-right">
+        <div id="inputs">
+            <form id="url-form">
+                <input id="url-input" type="url" placeholder="Add url of media..." autocomplete="off" readonly required>
+            </form><span id="slash">/</span><i id="add-btn" class="fas fa-plus-circle" title="Add local media"></i>
+            <input id="file-input" type="file" multiple>
+        </div>
+        <ul id="playlist"></ul>
+        <div id="playlist-options">
+            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-share-alt-square"></i>
+            <i class="fab fa-github"></i>
+        </div>
+    </div>
     <script>
         window.onload = function () {
             const video = document.getElementById("video");
 
             const playPause = document.getElementById("play-pause");
+            function videoSource () {
+                return video.src != "";
+            }
+            function currentItem () {
+                return [...document.getElementsByClassName("item-index")].find(function (item) {
+                    return item.url == video.src;
+                });
+            }
+            function playPreviousItem() {
+                let previousItem = currentItem().parentElement.previousElementSibling;
+                if (previousItem != null) {
+                    previousItem.getElementsByClassName("item-index")[0].click();
+                }
+            }
+            function playNextItem() {
+                let nextItem = currentItem().parentElement.nextElementSibling;
+                if (nextItem != null) {
+                    nextItem.getElementsByClassName("item-index")[0].click();
+                }
+            }
+            function activateListNumber(e) {
+                e.getElementsByClassName("index-number")[0].classList.remove("hidden");
+                e.getElementsByClassName("fa-play-circle")[0].classList.add("hidden");
+                e.getElementsByClassName("fa-pause-circle")[0].classList.add("hidden");
+            }
+            function activateListPauseIcon (e) {
+                e.getElementsByClassName("index-number")[0].classList.add("hidden");
+                e.getElementsByClassName("fa-play-circle")[0].classList.add("hidden");
+                e.getElementsByClassName("fa-pause-circle")[0].classList.remove("hidden");
+            }
+            function activateListPlayIcon (e) {
+                e.getElementsByClassName("index-number")[0].classList.add("hidden");
+                e.getElementsByClassName("fa-play-circle")[0].classList.remove("hidden");
+                e.getElementsByClassName("fa-pause-circle")[0].classList.add("hidden");
+            }
+            function activateBothPauseIcon () {
+                playPause.classList.remove("fa-play-circle");
+                playPause.classList.add("fa-pause-circle");
+                activateListPauseIcon(currentItem());
+            }
+            function activateBothPlayIcon () {
+                playPause.classList.remove("fa-pause-circle");
+                playPause.classList.add("fa-play-circle");
+                activateListPlayIcon(currentItem());
+            }
             playPause.addEventListener("click", function () {
-                if (video.paused == true) {
+                if (video.paused == true && videoSource()) {
                     video.play();
-                    playPause.classList.remove("fa-play-circle");
-                    playPause.classList.add("fa-pause-circle");
-                } else {
+                    activateBothPauseIcon();
+                } else if (video.paused == false && videoSource()){
                     video.pause();
-                    playPause.classList.add("fa-play-circle");
-                    playPause.classList.remove("fa-pause-circle");
+                    activateBothPlayIcon();
                 }
             });
 
             const backward = document.getElementById("backward");
             const forward = document.getElementById("forward");
             backward.addEventListener("click", function () {
-                video.currentTime -= 10;
-                seekBar.value = (100 / video.duration) * video.currentTime;
+                if (videoSource()) {
+                    video.currentTime -= 10;
+                    seekBar.value = (100 / video.duration) * video.currentTime;
+                }
             });
             forward.addEventListener("click", function () {
-                video.currentTime += 10;
-                seekBar.value = (100 / video.duration) * video.currentTime;
+                if (videoSource()) {
+                    video.currentTime += 10;
+                    seekBar.value = (100 / video.duration) * video.currentTime;
+                }
             });
 
             document.addEventListener('keydown', function (e) {
@@ -245,12 +431,26 @@
                         playPause.click();
                         break;
                     case 37:
-                        video.currentTime -= 10;
-                        seekBar.value = (100 / video.duration) * video.currentTime;
+                        if (videoSource()) {
+                            video.currentTime -= 10;
+                            seekBar.value = (100 / video.duration) * video.currentTime;
+                        }
+                        break;
+                    case 38:
+                        if (videoSource()) {
+                            playPreviousItem();
+                        }
                         break;
                     case 39:
-                        video.currentTime += 10;
-                        seekBar.value = (100 / video.duration) * video.currentTime;
+                        if (videoSource()) {
+                            video.currentTime += 10;
+                            seekBar.value = (100 / video.duration) * video.currentTime;
+                        }
+                        break;
+                    case 40:
+                        if (videoSource()) {
+                            playNextItem();
+                        }
                         break;
                 }
             });
@@ -276,46 +476,40 @@
             
             const seekBar = document.getElementById("seek-bar");
             seekBar.addEventListener("change", function () {
-                video.currentTime =  (video.duration * seekBar.value) / 100;
+                if (videoSource()) {
+                    video.currentTime =  video.duration * (seekBar.value / 100);
+                }
             });
             seekBar.addEventListener("mousedown", function () {
-                video.pause();
-                playPause.classList.add("fa-play-circle");
-                playPause.classList.remove("fa-pause-circle");
+                if (videoSource()) {
+                    video.pause();
+                    activateBothPlayIcon();
+                }
             });
             seekBar.addEventListener("mouseup", function () {
-                video.play();
-                playPause.classList.remove("fa-play-circle");
-                playPause.classList.add("fa-pause-circle");
+                if (videoSource()) {
+                    video.play();
+                    activateBothPauseIcon();
+                } else {
+                    seekBar.value = 0;
+                }
             });
 
             const volumeBar = document.getElementById("volume-bar");
             const muteUnmute = document.getElementById("mute-unmute");
             function changeVolumeIcon(volume) {
                 if (volume == 0) {
-                    if (muteUnmute.classList.contains("fa-volume-up")) {
-                        muteUnmute.classList.remove("fa-volume-up");
-                        muteUnmute.classList.add("fa-volume-mute");
-                    } else if (muteUnmute.classList.contains("fa-volume-down")) {
-                        muteUnmute.classList.remove("fa-volume-down");
-                        muteUnmute.classList.add("fa-volume-mute");
-                    }
+                    muteUnmute.classList.remove("fa-volume-up");
+                    muteUnmute.classList.remove("fa-volume-down");
+                    muteUnmute.classList.add("fa-volume-mute");
                 } else if (volume > 0 && volume <= 0.5) {
-                    if (muteUnmute.classList.contains("fa-volume-up")) {
-                        muteUnmute.classList.remove("fa-volume-up");
-                        muteUnmute.classList.add("fa-volume-down");
-                    } else if (muteUnmute.classList.contains("fa-volume-mute")) {
-                        muteUnmute.classList.remove("fa-volume-mute");
-                        muteUnmute.classList.add("fa-volume-down");
-                    }
+                    muteUnmute.classList.remove("fa-volume-up");
+                    muteUnmute.classList.add("fa-volume-down");
+                    muteUnmute.classList.remove("fa-volume-mute");
                 } else if (volume >= 0.5 && volume <= 1) {
-                    if (muteUnmute.classList.contains("fa-volume-down")) {
-                        muteUnmute.classList.remove("fa-volume-down");
-                        muteUnmute.classList.add("fa-volume-up");
-                    } else if (muteUnmute.classList.contains("fa-volume-mute")) {
-                        muteUnmute.classList.remove("fa-volume-mute");
-                        muteUnmute.classList.add("fa-volume-up");
-                    }
+                    muteUnmute.classList.add("fa-volume-up");
+                    muteUnmute.classList.remove("fa-volume-down");
+                    muteUnmute.classList.remove("fa-volume-mute");
                 }
             }
             let previousVolume = 0.5;
@@ -338,12 +532,14 @@
 
             const fullscreen = document.getElementById("fullscreen");
             fullscreen.addEventListener("click", function () {
-                if (video.requestFullscreen) {
-                    video.requestFullscreen();
-                } else if (video.mozRequestFullScreen) {
-                    video.mozRequestFullScreen();
-                } else if (video.webkitRequestFullscreen) {
-                    video.webkitRequestFullscreen();
+                if (videoSource()) {
+                    if (video.requestFullscreen) {
+                        video.requestFullscreen();
+                    } else if (video.mozRequestFullScreen) {
+                        video.mozRequestFullScreen();
+                    } else if (video.webkitRequestFullscreen) {
+                        video.webkitRequestFullscreen();
+                    }
                 }
             });
 
@@ -354,6 +550,71 @@
                     video.playbackRate = Number((this.textContent).replace(/^\D+|\D+$/g, ""));
                     currentSpeed.innerHTML = this.textContent;
                 });
+            });
+
+            const addBtn = document.getElementById("add-btn");
+            const fileInput = document.getElementById("file-input");
+            addBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                fileInput.click();
+            });
+
+            const playlist = document.getElementById("playlist");
+            let templist = [];
+            fileInput.addEventListener('change', function () {
+                let startIndex = templist.length;
+                templist.push(...Array.from(this.files));
+                for (let i = startIndex; i < templist.length; i++) {
+                    let file = templist[i];
+                    let listItem = document.createElement("li");
+                    listItem.className = "list-item";
+                    listItem.innerHTML = `
+                        <span class="item-index">
+                            <span class="index-number">${i+1}</span>
+                            <i class="fas fa-play-circle hidden"></i>
+                            <i class="fas fa-pause-circle hidden"></i>
+                        </span>
+                        <span class="item-name">${file.name}</span>
+                    `
+                    let itemIndex = listItem.getElementsByClassName("item-index")[0];
+                    itemIndex.url = URL.createObjectURL(file);
+                    itemIndex.addEventListener('click', function () {
+                        if (video.src != this.url) {
+                            [...document.getElementsByClassName("item-index")].forEach(function (item) {
+                                if (item.url != this.url) {
+                                    activateListNumber(item);
+                                }
+                            });
+                            video.src = this.url;
+                            playPause.click();
+                            activateListPauseIcon(this);
+                        } else {
+                            playPause.click();
+                            if (video.paused == true) {
+                                activateListPlayIcon(this);
+                            } else {
+                                activateListPauseIcon(this);
+                            }
+                        }
+                    });
+                    itemIndex.addEventListener('mouseover', function () {
+                        if (video.src != this.url) {
+                            activateListPlayIcon(this);
+                        }
+                    });
+                    itemIndex.addEventListener('mouseout', function () {
+                        if (video.src != this.url) {
+                            activateListNumber(this);
+                        }
+                    });
+                    playlist.appendChild(listItem);
+                    if (i == 0) {
+                        itemIndex.click();
+                    }
+                }
+            });
+            video.addEventListener("ended", function () {
+                playNextItem();
             });
         }
     </script>
