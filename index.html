@@ -187,7 +187,6 @@
         .menu {
             position: absolute;
             top: 0;
-            z-index: 10;
             width: 25%;
             height: 56.25vw;
             max-height: 100vh;
@@ -530,17 +529,51 @@
                 changeVolumeIcon(volumeBar.value);
             });
 
+            const body = document.body;
             const fullscreen = document.getElementById("fullscreen");
+            function fullscreenAvailabe() {
+                return document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullscreenEnabled || document.msFullscreenEnabled;
+            }
+            function inFullscreen() {
+                return document.fullscreenElement != null || document.webkitFullscreenElement != null || document.mozFullScreenElement != null || document.msFullscreenElement != null;
+            }
             fullscreen.addEventListener("click", function () {
-                if (videoSource()) {
-                    if (video.requestFullscreen) {
-                        video.requestFullscreen();
-                    } else if (video.mozRequestFullScreen) {
-                        video.mozRequestFullScreen();
-                    } else if (video.webkitRequestFullscreen) {
-                        video.webkitRequestFullscreen();
+                if (fullscreenAvailabe()) {
+                    if (inFullscreen()) {
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.webkitExitFullscreen) {
+                            document.webkitExitFullscreen();
+                        } else if (document.mozCancelFullScreen) {
+                            document.mozCancelFullScreen();
+                        } else if (document.msExitFullscreen) {
+                            document.msExitFullscreen();
+                        }
+                    } else {
+                        if (body.requestFullscreen) {
+                            body.requestFullscreen();
+                        } else if (body.mozRequestFullScreen) {
+                            body.mozRequestFullScreen();
+                        } else if (body.webkitRequestFullScreen) {
+                            body.webkitRequestFullScreen();
+                        } else if (body.msRequestFullscreen) {
+                            body.msRequestFullscreen();
+                        }
                     }
                 }
+            });
+            const figure = document.getElementById("figure");
+            let timer;
+            figure.addEventListener("mousemove", function () {
+                clearTimeout(timer);
+                body.style.cursor = 'auto';
+                document.getElementById("controls-mid").style.opacity = "1";
+                document.getElementById("controls-bar").style.opacity = "1";
+                timer = setTimeout(function () {
+                    document.getElementById("controls-mid").style.opacity = "0";
+                    document.getElementById("controls-bar").style.opacity = "0";
+                    body.style.cursor = 'none';
+                }, 5000);
             });
 
             const currentSpeed = document.getElementById("current-speed");
