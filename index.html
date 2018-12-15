@@ -257,7 +257,7 @@
         }
         .list-item {
             display: flex;
-            height: 46px;
+            max-height: 46px;
             margin-top: 0px;
             border-top: 1px solid rgba(255,255,255,0.3);
             padding: 5px 0;
@@ -265,10 +265,11 @@
             margin-right: 5px;
         }
         .list-item:first-child {
-            height: 45px;
+            max-height: 45px;
             border: none;
         }
         .list-item:hover {
+            max-height: none;
             border-color: transparent;
             background-color: rgba(255,255,255,0.3);
         }
@@ -292,7 +293,10 @@
             overflow: hidden;
             white-space: nowrap;
             font-size: 20px;
-            line-height: 1.75;
+            line-height: 1.75;  
+        }
+        .item-name:hover {
+            white-space: normal;
         }
         #playlist-options {
             width: 100%;
@@ -529,7 +533,6 @@
                 changeVolumeIcon(volumeBar.value);
             });
 
-            const body = document.body;
             const fullscreen = document.getElementById("fullscreen");
             function fullscreenAvailabe() {
                 return document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullscreenEnabled || document.msFullscreenEnabled;
@@ -566,14 +569,19 @@
             let timer;
             figure.addEventListener("mousemove", function () {
                 clearTimeout(timer);
-                body.style.cursor = 'auto';
+                figure.style.cursor = 'auto';
                 document.getElementById("controls-mid").style.opacity = "1";
                 document.getElementById("controls-bar").style.opacity = "1";
                 timer = setTimeout(function () {
                     document.getElementById("controls-mid").style.opacity = "0";
                     document.getElementById("controls-bar").style.opacity = "0";
-                    body.style.cursor = 'none';
+                    figure.style.cursor = 'none';
                 }, 5000);
+            });
+            const menuRight = document.getElementById("menu-right");
+            menuRight.addEventListener("mousemove", function () {
+                document.getElementById("controls-mid").style.opacity = "0";
+                document.getElementById("controls-bar").style.opacity = "0";
             });
 
             const currentSpeed = document.getElementById("current-speed");
