@@ -395,85 +395,85 @@
     <body>
         <div id="video-container">
             <div id="video-figure">
-            <video id="video" poster></video>
+                <video id="video" poster></video>
                 <div id="video-controls">
                     <div id="video-controls-top">
                         Move cursor to extreme right to view playlist
                     </div>
                     <div id="video-controls-mid">
-                <i id="backward" class="fas fa-undo"></i>
-                <i id="play-pause" class="far fa-play-circle"></i>
-                <i id="forward" class="fas fa-redo"></i>
-            </div>
+                        <i id="backward" class="fas fa-undo"></i>
+                        <i id="play-pause" class="far fa-play-circle"></i>
+                        <i id="forward" class="fas fa-redo"></i>
+                    </div>
                     <div id="video-controls-bottom">
-                <span id="video-time"
-                    ><span id="current-time"></span> /
-                    <span id="video-duration"></span
-                ></span>
-                <span id="right-control">
-                    <span id="volume"
+                        <span id="video-time"
+                            ><span id="current-time"></span> /
+                            <span id="video-duration"></span
+                        ></span>
+                        <span id="right-control">
+                            <span id="volume"
                                 ><i
                                     id="mute-unmute"
                                     class="fas fa-volume-up"
                                 ></i
-                        ><input
-                            type="range"
-                            id="volume-bar"
-                            min="0"
-                            max="1"
-                            step="0.1"
-                            value="1"
-                    /></span>
-                    <i id="fullscreen" class="fas fa-arrows-alt"></i>
-                    <div id="playback-speed">
-                        <div id="current-speed">1x</div>
-                        <div id="speed-options">
-                            <p class="speed">3x</p>
-                            <p class="speed">2.5x</p>
-                            <p class="speed">2x</p>
-                            <p class="speed">1.5x</p>
-                            <p class="speed">1x</p>
-                            <p class="speed">0.75x</p>
-                            <p class="speed">0.50x</p>
-                            <p class="speed">0.25x</p>
-                        </div>
-                    </div>
-                </span>
+                                ><input
+                                    type="range"
+                                    id="volume-bar"
+                                    min="0"
+                                    max="1"
+                                    step="0.1"
+                                    value="1"
+                            /></span>
+                            <i id="fullscreen" class="fas fa-arrows-alt"></i>
+                            <div id="playback-speed">
+                                <div id="current-speed">1x</div>
+                                <div id="speed-options">
+                                    <p class="speed">3x</p>
+                                    <p class="speed">2.5x</p>
+                                    <p class="speed">2x</p>
+                                    <p class="speed">1.5x</p>
+                                    <p class="speed">1x</p>
+                                    <p class="speed">0.75x</p>
+                                    <p class="speed">0.50x</p>
+                                    <p class="speed">0.25x</p>
+                                </div>
+                            </div>
+                        </span>
                         <input
                             type="range"
                             id="seek-bar"
                             value="0"
                             step="0.5"
                         />
-            </div>
-        </div>
-        <div class="menu" id="menu-right">
-            <div id="inputs">
-                <form id="url-form">
-                    <input
-                        id="url-input"
-                        type="url"
-                        placeholder="Add url of media..."
-                        autocomplete="off"
-                        readonly
-                        required
-                    />
-                </form>
-                <span id="slash">/</span
-                ><i
-                    id="add-btn"
-                    class="fas fa-plus-circle"
-                    title="Add local media"
-                ></i>
-                <input id="file-input" type="file" multiple />
-            </div>
-            <ul id="playlist"></ul>
-            <div id="playlist-options">
-                <i class="fas fa-check-circle"></i>
-                <i class="fas fa-share-alt-square"></i>
-                <i class="fab fa-github"></i>
-            </div>
-        </div>
+                    </div>
+                </div>
+                <div class="menu" id="menu-right">
+                    <div id="inputs">
+                        <form id="url-form">
+                            <input
+                                id="url-input"
+                                type="url"
+                                placeholder="Add url of media..."
+                                autocomplete="off"
+                                readonly
+                                required
+                            />
+                        </form>
+                        <span id="slash">/</span
+                        ><i
+                            id="add-btn"
+                            class="fas fa-plus-circle"
+                            title="Add local media"
+                        ></i>
+                        <input id="file-input" type="file" multiple />
+                    </div>
+                    <ul id="playlist"></ul>
+                    <div id="playlist-options">
+                        <i class="fas fa-check-circle"></i>
+                        <i class="fas fa-share-alt-square"></i>
+                        <i class="fab fa-github"></i>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -609,6 +609,18 @@
                                 playNextItem();
                             }
                             break;
+                        case 70:
+                            toggleFullscreen();
+                            break;
+                        case 77:
+                            toggleMute();
+                            break;
+                        case 187:
+                            highSpeed();
+                            break;
+                        case 189:
+                            slowSpeed();
+                            break;
                     }
                 });
 
@@ -673,14 +685,15 @@
                     }
                 }
                 let previousVolume = 0.5;
-                muteUnmute.addEventListener("click", function () {
+                function toggleMute() {
                     if (video.volume == 0) {
                         video.volume = previousVolume;
                     } else {
                         previousVolume = video.volume;
                         video.volume = 0;
                     }
-                });
+                }
+                muteUnmute.addEventListener("click", toggleMute);
                 video.addEventListener("volumechange", function () {
                     volumeBar.value = video.volume;
                     changeVolumeIcon(volumeBar.value);
@@ -708,7 +721,7 @@
                         document.msFullscreenElement != null
                     );
                 }
-                fullscreen.addEventListener("click", function () {
+                function toggleFullscreen() {
                     if (fullscreenAvailabe()) {
                         if (inFullscreen()) {
                             if (document.exitFullscreen) {
@@ -732,7 +745,8 @@
                             }
                         }
                     }
-                });
+                }
+                fullscreen.addEventListener("click", toggleFullscreen);
                 const videoControls = document.getElementById("video-controls");
                 let timer;
                 videoControls.addEventListener("mousemove", function () {
@@ -780,13 +794,46 @@
 
                 const currentSpeed = document.getElementById("current-speed");
                 const speedOptions = document.getElementsByClassName("speed");
-                [...speedOptions].forEach(function (speed) {
-                    speed.addEventListener("click", function () {
+                function highSpeed() {
+                    if (videoSource()) {
+                        [...speedOptions].some(function (speed, ind) {
+                            if (
+                                speed.textContent === currentSpeed.textContent
+                            ) {
+                                if (ind - 1 >= 0) {
+                                    speedOptions[ind - 1].click();
+                                }
+                                return true;
+                            }
+                            return false;
+                        });
+                    }
+                }
+                function slowSpeed() {
+                    if (videoSource()) {
+                        [...speedOptions].some(function (speed, ind) {
+                            if (
+                                speed.textContent === currentSpeed.textContent
+                            ) {
+                                if (ind + 1 < speedOptions.length) {
+                                    speedOptions[ind + 1].click();
+                                }
+                                return true;
+                            }
+                            return false;
+                        });
+                    }
+                }
+                function changeSpeed() {
+                    if (videoSource()) {
                         video.playbackRate = Number(
                             this.textContent.replace(/^\D+|\D+$/g, "")
                         );
                         currentSpeed.innerHTML = this.textContent;
-                    });
+                    }
+                }
+                [...speedOptions].forEach(function (speed) {
+                    speed.addEventListener("click", changeSpeed);
                 });
 
                 const addBtn = document.getElementById("add-btn");
