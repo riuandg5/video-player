@@ -33,40 +33,59 @@
                 cursor: pointer;
             }
 
-            #figure {
+            #video-container {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+            }
+
+            #video-figure {
                 position: relative;
             }
 
-            #figure,
+            #video-figure,
             #video,
-            #controls-mid,
-            #controls-bar {
-                margin: 0 auto;
+            #video-controls {
                 width: 100vw;
                 height: 56.25vw;
                 max-width: 177.78vh;
                 max-height: 100vh;
+                color: white;
             }
 
-            #controls-bar {
-                opacity: 0;
-                transition: opacity 0.5s;
+            #video-controls {
                 position: absolute;
-                top: 87%;
-                height: 80px;
-                max-height: none;
+                top: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            #video-controls-top,
+            #video-controls-mid,
+            #video-controls-bottom {
+                width: 100%;
+                text-align: center;
+            }
+
+            #video-controls-top {
+                font-size: 25px;
+                opacity: 1;
+                transition: opacity 0.5s;
+            }
+
+            #video-controls-top,
+            #video-controls-bottom {
                 padding: 0.8em 2em;
             }
 
-            #controls-mid {
-                opacity: 0;
+            #video-controls-mid {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                opacity: 1;
                 transition: opacity 0.5s;
-                position: absolute;
-                top: 40%;
-                height: 7em;
-                max-height: none;
-                text-align: center;
-                color: white;
             }
 
             #play-pause {
@@ -74,32 +93,35 @@
                 margin: 0 0.8em;
             }
 
-            #backward {
-                font-size: 4em;
-                vertical-align: 15px;
-                color: rgba(255, 255, 255, 0.8);
-            }
-
+            #backward,
             #forward {
                 font-size: 4em;
-                vertical-align: 15px;
                 color: rgba(255, 255, 255, 0.8);
             }
 
-            #figure:hover #controls-mid,
-            #figure:hover #controls-bar {
+            #video-controls-bottom {
+                opacity: 1;
+                transition: opacity 0.5s;
+            }
+
+            #video-controls:hover #video-controls-top,
+            #video-controls:hover #video-controls-mid,
+            #video-controls:hover #video-controls-bottom {
                 opacity: 1;
                 transition: opacity 0.5s;
             }
 
             #video-time {
-                color: white;
+                float: left;
                 font-size: 25px;
+            }
+
+            #right-control {
+                float: right;
             }
 
             #volume {
                 font-size: 25px;
-                color: white;
             }
 
             #mute-unmute {
@@ -221,10 +243,6 @@
 
             .speed:not(:last-child) {
                 border-bottom: 1px solid white;
-            }
-
-            #right-control {
-                float: right;
             }
 
             .menu {
@@ -375,21 +393,29 @@
     </head>
 
     <body>
-        <div id="figure">
+        <div id="video-container">
+            <div id="video-figure">
             <video id="video" poster></video>
-            <div id="controls-mid">
+                <div id="video-controls">
+                    <div id="video-controls-top">
+                        Move cursor to extreme right to view playlist
+                    </div>
+                    <div id="video-controls-mid">
                 <i id="backward" class="fas fa-undo"></i>
                 <i id="play-pause" class="far fa-play-circle"></i>
                 <i id="forward" class="fas fa-redo"></i>
             </div>
-            <div id="controls-bar">
+                    <div id="video-controls-bottom">
                 <span id="video-time"
                     ><span id="current-time"></span> /
                     <span id="video-duration"></span
                 ></span>
                 <span id="right-control">
                     <span id="volume"
-                        ><i id="mute-unmute" class="fas fa-volume-up"></i
+                                ><i
+                                    id="mute-unmute"
+                                    class="fas fa-volume-up"
+                                ></i
                         ><input
                             type="range"
                             id="volume-bar"
@@ -413,7 +439,12 @@
                         </div>
                     </div>
                 </span>
-                <input type="range" id="seek-bar" value="0" step="0.5" />
+                        <input
+                            type="range"
+                            id="seek-bar"
+                            value="0"
+                            step="0.5"
+                        />
             </div>
         </div>
         <div class="menu" id="menu-right">
@@ -443,6 +474,9 @@
                 <i class="fab fa-github"></i>
             </div>
         </div>
+            </div>
+        </div>
+
         <script>
             window.onload = function () {
                 const video = document.getElementById("video");
@@ -699,25 +733,49 @@
                         }
                     }
                 });
-                const figure = document.getElementById("figure");
+                const videoControls = document.getElementById("video-controls");
                 let timer;
-                figure.addEventListener("mousemove", function () {
+                videoControls.addEventListener("mousemove", function () {
                     clearTimeout(timer);
-                    figure.style.cursor = "auto";
-                    document.getElementById("controls-mid").style.opacity = "1";
-                    document.getElementById("controls-bar").style.opacity = "1";
+                    videoControls.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                    videoControls.style.cursor = "auto";
+                    document.getElementById(
+                        "video-controls-top"
+                    ).style.opacity = "1";
+                    document.getElementById(
+                        "video-controls-mid"
+                    ).style.opacity = "1";
+                    document.getElementById(
+                        "video-controls-bottom"
+                    ).style.opacity = "1";
                     timer = setTimeout(function () {
-                        document.getElementById("controls-mid").style.opacity =
-                            "0";
-                        document.getElementById("controls-bar").style.opacity =
-                            "0";
-                        figure.style.cursor = "none";
-                    }, 5000);
+                        if (videoSource()) {
+                            document.getElementById(
+                                "video-controls-top"
+                            ).style.opacity = "0";
+                            document.getElementById(
+                                "video-controls-mid"
+                            ).style.opacity = "0";
+                            document.getElementById(
+                                "video-controls-bottom"
+                            ).style.opacity = "0";
+                            videoControls.style.cursor = "none";
+                            videoControls.style.backgroundColor =
+                                "rgba(0, 0, 0, 0)";
+                        }
+                    }, 2500);
                 });
                 const menuRight = document.getElementById("menu-right");
                 menuRight.addEventListener("mousemove", function () {
-                    document.getElementById("controls-mid").style.opacity = "0";
-                    document.getElementById("controls-bar").style.opacity = "0";
+                    document.getElementById(
+                        "video-controls-top"
+                    ).style.opacity = "0";
+                    document.getElementById(
+                        "video-controls-mid"
+                    ).style.opacity = "0";
+                    document.getElementById(
+                        "video-controls-bottom"
+                    ).style.opacity = "0";
                 });
 
                 const currentSpeed = document.getElementById("current-speed");
@@ -738,6 +796,8 @@
                     fileInput.click();
                 });
 
+                const controlsTop =
+                    document.getElementById("video-controls-top");
                 const playlist = document.getElementById("playlist");
                 let templist = [];
                 fileInput.addEventListener("change", function () {
@@ -770,6 +830,7 @@
                                     }
                                 });
                                 video.src = this.url;
+                                controlsTop.innerHTML = file.name;
                                 playPause.click();
                                 activateListPauseIcon(this);
                             } else {
