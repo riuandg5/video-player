@@ -20,6 +20,7 @@
                 box-sizing: border-box;
                 text-decoration: none;
                 font-family: "Montserrat", sans-serif;
+                color: white;
             }
 
             body {
@@ -120,8 +121,10 @@
                 float: right;
             }
 
+            #pitch,
             #volume {
                 font-size: 25px;
+                margin-left: 15px;
             }
 
             #mute-unmute {
@@ -131,6 +134,7 @@
                 cursor: pointer;
             }
 
+            #pitch-bar,
             #volume-bar,
             #seek-bar {
                 -webkit-appearance: none;
@@ -140,12 +144,14 @@
                 transition: background-color 0.2s;
             }
 
+            #pitch-bar:hover,
             #volume-bar:hover,
             #seek-bar:hover {
                 background-color: rgba(200, 200, 200, 1);
                 transition: background-color 0.2s;
             }
 
+            #pitch-bar,
             #volume-bar {
                 width: 100px;
                 height: 4px;
@@ -160,6 +166,7 @@
                 border-radius: 4px;
             }
 
+            #pitch-bar::-webkit-slider-thumb,
             #volume-bar::-webkit-slider-thumb,
             #seek-bar::-webkit-slider-thumb {
                 -webkit-appearance: none;
@@ -170,6 +177,7 @@
                 cursor: pointer;
             }
 
+            #pitch-bar::-webkit-slider-thumb,
             #volume-bar::-webkit-slider-thumb {
                 width: 12px;
                 height: 12px;
@@ -189,10 +197,11 @@
                 margin-left: 15px;
             }
 
+            #pitch-mode,
             #playback-speed {
                 display: inline-block;
                 position: relative;
-                width: 55px;
+                width: 75px;
                 height: 25px;
                 text-align: center;
                 border: 1px solid white;
@@ -201,17 +210,28 @@
                 margin-left: 15px;
             }
 
+            #pitch-mode {
+                width: 120px;
+                margin-left: 0;
+            }
+
+            #current-mode,
             #current-speed {
                 position: absolute;
                 top: 0;
                 left: 0;
-                width: 55px;
+                width: 75px;
                 height: 25px;
                 font-size: 20px;
                 line-height: 1.1;
                 color: white;
             }
 
+            #current-mode {
+                width: 120px;
+            }
+
+            #mode-options,
             #speed-options {
                 visibility: hidden;
                 opacity: 0;
@@ -219,17 +239,26 @@
                 position: absolute;
                 top: -242px;
                 left: -1px;
-                width: 55px;
+                width: 75px;
                 height: 242px;
                 border: 1px solid white;
             }
 
+            #mode-options {
+                width: 120px;
+                height: 60px;
+                top: -60px;
+                left: -1px;
+            }
+
+            #pitch-mode:hover #mode-options,
             #playback-speed:hover #speed-options {
                 visibility: visible;
                 opacity: 1;
                 transition: all 0.5s;
             }
 
+            .mode,
             .speed {
                 height: 30px;
                 font-size: 20px;
@@ -237,10 +266,12 @@
                 color: white;
             }
 
+            .mode:hover,
             .speed:hover {
                 background-color: rgba(255, 255, 255, 0.2);
             }
 
+            .mode:not(:last-child),
             .speed:not(:last-child) {
                 border-bottom: 1px solid white;
             }
@@ -390,6 +421,7 @@
                 color: white;
             }
         </style>
+        <script src="AudioUtil.js"></script>
     </head>
 
     <body>
@@ -411,19 +443,37 @@
                             <span id="video-duration"></span
                         ></span>
                         <span id="right-control">
-                            <span id="volume"
-                                ><i
+                            <div id="pitch-mode">
+                                <div id="current-mode">Smooth</div>
+                                <div id="mode-options">
+                                    <p class="mode">Smooth</p>
+                                    <p class="mode">Semitone</p>
+                                </div>
+                            </div>
+                            <span id="pitch">
+                                <input
+                                    type="range"
+                                    id="pitch-bar"
+                                    min="-1"
+                                    max="1"
+                                    step="0.01"
+                                    value="0"
+                                />
+                            </span>
+                            <span id="volume">
+                                <i
                                     id="mute-unmute"
                                     class="fas fa-volume-up"
-                                ></i
-                                ><input
+                                ></i>
+                                <input
                                     type="range"
                                     id="volume-bar"
                                     min="0"
                                     max="1"
                                     step="0.1"
                                     value="1"
-                            /></span>
+                                />
+                            </span>
                             <i id="fullscreen" class="fas fa-arrows-alt"></i>
                             <div id="playback-speed">
                                 <div id="current-speed">1x</div>
@@ -450,14 +500,14 @@
                 <div class="menu" id="menu-right">
                     <div id="inputs">
                         <form id="url-form">
-                            <input
-                                id="url-input"
-                                type="url"
-                                placeholder="Add url of media..."
-                                autocomplete="off"
+                        <input
+                            id="url-input"
+                            type="url"
+                            placeholder="Add url of media..."
+                            autocomplete="off"
                                 readonly
-                                required
-                            />
+                            required
+                        />
                         </form>
                         <span id="slash">/</span
                         ><i
@@ -480,6 +530,7 @@
         <script>
             window.onload = function () {
                 const video = document.getElementById("video");
+                video.crossOrigin = "anonymous";
 
                 const playPause = document.getElementById("play-pause");
                 function videoSource() {
@@ -664,6 +715,55 @@
                         activateBothPauseIcon();
                     } else {
                         seekBar.value = 0;
+                    }
+                });
+
+                const currentMode = document.getElementById("current-mode");
+                currentMode.style.textDecoration = "line-through";
+                const modeOptions = document.getElementsByClassName("mode");
+                const pitchBar = document.getElementById("pitch-bar");
+                let audioContext = null,
+                    audioUtil = null,
+                    outputNode = null;
+                let pitchMode = false;
+                function changePitch() {
+                    if (!audioUtil) {
+                        audioContext = new AudioContext();
+                        outputNode =
+                            audioContext.createMediaElementSource(video);
+                        audioUtil = new AudioUtil(audioContext);
+                        audioUtil.output.connect(audioContext.destination);
+                        outputNode.connect(audioUtil.input);
+                    }
+                    audioUtil.setPitchOffset(pitchBar.value, pitchMode);
+                    currentMode.style.textDecoration = "none";
+                }
+                pitchBar.addEventListener("change", changePitch);
+                function changeMode() {
+                    if (this.textContent === "Semitone") {
+                        pitchMode = true;
+                        pitchBar.min = -24;
+                        pitchBar.max = 24;
+                        pitchBar.step = 1;
+                        pitchBar.value = 0;
+                    } else {
+                        pitchMode = false;
+                        pitchBar.min = -1;
+                        pitchBar.max = 1;
+                        pitchBar.step = 0.01;
+                        pitchBar.value = 0;
+                    }
+                    currentMode.innerHTML = this.textContent;
+                    changePitch();
+                }
+                [...modeOptions].forEach(function (mode) {
+                    mode.addEventListener("click", changeMode);
+                });
+                currentMode.addEventListener("click", function () {
+                    if (audioUtil) {
+                        pitchBar.value = 0;
+                        audioUtil.setPitchOffset(pitchBar.value, pitchMode);
+                        currentMode.style.textDecoration = "line-through";
                     }
                 });
 
