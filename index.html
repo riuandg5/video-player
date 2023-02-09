@@ -314,11 +314,8 @@
                 padding-bottom: 20px;
             }
 
-            #url-form {
-                flex-grow: 1;
-            }
-
             #url-input {
+                flex-grow: 1;
                 width: 100%;
                 height: 35px;
                 vertical-align: 6.8px;
@@ -499,16 +496,13 @@
                 </div>
                 <div class="menu" id="menu-right">
                     <div id="inputs">
-                        <form id="url-form">
                         <input
                             id="url-input"
                             type="url"
                             placeholder="Add url of media..."
                             autocomplete="off"
-                                readonly
                             required
                         />
-                        </form>
                         <span id="slash">/</span
                         ><i
                             id="add-btn"
@@ -521,7 +515,9 @@
                     <div id="playlist-options">
                         <i class="fas fa-check-circle"></i>
                         <i class="fas fa-share-alt-square"></i>
-                        <i class="fab fa-github"></i>
+                        <a href="https://github.com/riuandg5/video-player"
+                            ><i class="fab fa-github"></i
+                        ></a>
                     </div>
                 </div>
             </div>
@@ -936,20 +932,32 @@
                     speed.addEventListener("click", changeSpeed);
                 });
 
+                const urlInput = document.getElementById("url-input");
                 const addBtn = document.getElementById("add-btn");
                 const fileInput = document.getElementById("file-input");
                 addBtn.addEventListener("click", function (e) {
                     e.preventDefault();
-                    fileInput.click();
+                    if (urlInput.value !== "") {
+                        addVideo();
+                    } else {
+                        fileInput.click();
+                    }
                 });
 
                 const controlsTop =
                     document.getElementById("video-controls-top");
                 const playlist = document.getElementById("playlist");
                 let templist = [];
-                fileInput.addEventListener("change", function () {
+                function addVideo() {
                     let startIndex = templist.length;
-                    templist.push(...Array.from(this.files));
+                    var fileUrl = "";
+                    if (urlInput.value !== "") {
+                        fileUrl = urlInput.value;
+                        urlInput.value = "";
+                        templist.push({ name: fileUrl });
+                    } else {
+                        templist.push(...Array.from(this.files));
+                    }
                     for (let i = startIndex; i < templist.length; i++) {
                         let file = templist[i];
                         let listItem = document.createElement("li");
@@ -964,7 +972,7 @@
                     `;
                         let itemIndex =
                             listItem.getElementsByClassName("item-index")[0];
-                        itemIndex.url = URL.createObjectURL(file);
+                        itemIndex.url = fileUrl || URL.createObjectURL(file);
                         itemIndex.addEventListener("click", function () {
                             if (video.src != this.url) {
                                 [
@@ -1004,7 +1012,8 @@
                             itemIndex.click();
                         }
                     }
-                });
+                }
+                fileInput.addEventListener("change", addVideo);
                 video.addEventListener("ended", function () {
                     playNextItem();
                 });
