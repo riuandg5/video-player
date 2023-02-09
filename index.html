@@ -61,6 +61,7 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
+                background-color: rgba(0, 0, 0, 0.5);
             }
 
             #video-controls-top,
@@ -950,8 +951,11 @@
                 let templist = [];
                 function addVideo() {
                     let startIndex = templist.length;
-                    var fileUrl = "";
-                    if (urlInput.value !== "") {
+                    let fileUrl = "";
+                    if (paramSrc && video.src !== paramSrc) {
+                        fileUrl = paramSrc;
+                        templist.push({ name: fileUrl });
+                    } else if (urlInput.value !== "") {
                         fileUrl = urlInput.value;
                         urlInput.value = "";
                         templist.push({ name: fileUrl });
@@ -986,8 +990,10 @@
                                 });
                                 video.src = this.url;
                                 controlsTop.innerHTML = file.name;
-                                playPause.click();
-                                activateListPauseIcon(this);
+                                if (!paramSrc) {
+                                    playPause.click();
+                                    activateListPauseIcon(this);
+                                }
                             } else {
                                 playPause.click();
                                 if (video.paused == true) {
@@ -1017,6 +1023,19 @@
                 video.addEventListener("ended", function () {
                     playNextItem();
                 });
+
+                const params = new Proxy(
+                    new URLSearchParams(window.location.search),
+                    {
+                        get: (searchParams, prop) => searchParams.get(prop),
+                    }
+                );
+                let paramSrc = null;
+                if (params.src) {
+                    paramSrc = params.src;
+                    addVideo();
+                    paramSrc = null;
+                }
             };
         </script>
     </body>
