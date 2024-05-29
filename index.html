@@ -13,6 +13,7 @@
         />
         <style>
             @import url("https://fonts.googleapis.com/css?family=Montserrat");
+            @import url("https://fonts.googleapis.com/css?family=Roboto+Mono");
 
             * {
                 margin: 0;
@@ -64,6 +65,7 @@
             }
 
             #video-controls {
+                height: 56.3vw;
                 position: absolute;
                 top: 0;
                 display: flex;
@@ -81,6 +83,7 @@
 
             #video-controls-top {
                 font-size: 25px;
+                word-break: break-all;
                 opacity: 1;
                 transition: opacity 0.5s;
             }
@@ -124,6 +127,11 @@
             #video-time {
                 float: left;
                 font-size: 25px;
+            }
+            
+            #current-time,
+            #video-duration {
+                font-family: "Roboto Mono", sans-serif;
             }
 
             #right-control {
@@ -308,7 +316,7 @@
                 position: absolute;
                 top: 0;
                 width: 25%;
-                height: 56.25vw;
+                height: 56.3vw;
                 max-height: 100vh;
                 padding: 20px;
                 background-color: rgba(0, 0, 0, 0.5);
@@ -387,7 +395,7 @@
 
             .list-item {
                 display: flex;
-                max-height: 46px;
+                /* max-height: 46px; */
                 margin-top: 0px;
                 border-top: 1px solid rgba(255, 255, 255, 0.3);
                 padding: 5px 0;
@@ -396,12 +404,12 @@
             }
 
             .list-item:first-child {
-                max-height: 45px;
+                /* max-height: 45px; */
                 border: none;
             }
 
             .list-item:hover {
-                max-height: none;
+                /* max-height: none; */
                 border-color: transparent;
                 background-color: rgba(255, 255, 255, 0.3);
             }
@@ -426,14 +434,9 @@
 
             .item-name {
                 flex: 1 0;
-                overflow: hidden;
-                white-space: nowrap;
+                word-break: break-all;
                 font-size: 20px;
                 line-height: 1.75;
-            }
-
-            .item-name:hover {
-                white-space: normal;
             }
 
             #playlist-options {
@@ -456,7 +459,7 @@
                 <div id="screen-filter-cover"></div>
                 <div id="video-controls">
                     <div id="video-controls-top">
-                        Move cursor to extreme right to view playlist
+                        Move cursor to extreme right to create / view playlist
                     </div>
                     <div id="video-controls-mid">
                         <i id="backward" class="fas fa-undo"></i>
@@ -1140,6 +1143,7 @@
                                     }
                                 });
                                 video.src = this.url;
+                                document.querySelector("title").textContent = file.name;
                                 controlsTop.innerHTML = file.name;
                                 if (!paramSrc) {
                                     playPause.click();
