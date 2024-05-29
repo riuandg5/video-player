@@ -254,10 +254,10 @@
                 opacity: 0;
                 transition: all 0.5s;
                 position: absolute;
-                top: -242px;
+                top: -302px;
                 left: -1px;
                 width: 75px;
-                height: 242px;
+                height: 302px;
                 border: 1px solid white;
             }
 
@@ -524,7 +524,9 @@
                                     <p class="speed">3x</p>
                                     <p class="speed">2.5x</p>
                                     <p class="speed">2x</p>
+                                    <p class="speed">1.75x</p>
                                     <p class="speed">1.5x</p>
+                                    <p class="speed">1.25x</p>
                                     <p class="speed">1x</p>
                                     <p class="speed">0.75x</p>
                                     <p class="speed">0.50x</p>
@@ -979,12 +981,13 @@
                         });
                     }
                 }
-                function changeSpeed() {
+                function changeSpeed(e) {
+                    const speed = e instanceof Event ? this : e;
                     if (videoSource()) {
                         video.playbackRate = Number(
-                            this.textContent.replace(/^\D+|\D+$/g, "")
+                            speed.textContent.replace(/^\D+|\D+$/g, "")
                         );
-                        currentSpeed.innerHTML = this.textContent;
+                        currentSpeed.innerHTML = speed.textContent;
                     }
                 }
                 [...speedOptions].forEach(function (speed) {
@@ -1150,6 +1153,7 @@
                                     activateListPauseIcon(this);
                                 }
                             }
+                            changeSpeed(currentSpeed);
                         });
                         itemIndex.addEventListener("mouseover", function () {
                             if (video.src != this.url) {
