@@ -43,16 +43,24 @@
 
             #video-figure {
                 position: relative;
+                overflow: hidden;
             }
 
             #video-figure,
             #video,
-            #video-controls {
+            #video-controls,
+            #screen-filter-cover {
                 width: 100vw;
                 height: 56.25vw;
                 /* max-width: 177.78vh; */
                 max-height: 100vh;
                 color: white;
+            }
+
+            #screen-filter-cover {
+                height: 56.3vw;
+                position: absolute;
+                top: 0;
             }
 
             #video-controls {
@@ -199,7 +207,8 @@
             }
 
             #pitch-mode,
-            #playback-speed {
+            #playback-speed,
+            #screen-filter {
                 display: inline-block;
                 position: relative;
                 width: 75px;
@@ -217,7 +226,8 @@
             }
 
             #current-mode,
-            #current-speed {
+            #current-speed,
+            #current-filter {
                 position: absolute;
                 top: 0;
                 left: 0;
@@ -228,12 +238,18 @@
                 color: white;
             }
 
+            #screen-filter,
+            #current-filter {
+                width: 160px;
+            }
+
             #current-mode {
                 width: 120px;
             }
 
             #mode-options,
-            #speed-options {
+            #speed-options,
+            #filter-options {
                 visibility: hidden;
                 opacity: 0;
                 transition: all 0.5s;
@@ -252,15 +268,24 @@
                 left: -1px;
             }
 
+            #filter-options {
+                width: 160px;
+                height: 360px;
+                top: -360px;
+                left: -0.75px;
+            }
+
             #pitch-mode:hover #mode-options,
-            #playback-speed:hover #speed-options {
+            #playback-speed:hover #speed-options,
+            #screen-filter:hover #filter-options {
                 visibility: visible;
                 opacity: 1;
                 transition: all 0.5s;
             }
 
             .mode,
-            .speed {
+            .speed,
+            .filter {
                 height: 30px;
                 font-size: 20px;
                 line-height: 1.5;
@@ -268,12 +293,14 @@
             }
 
             .mode:hover,
-            .speed:hover {
+            .speed:hover,
+            .filter:hover {
                 background-color: rgba(255, 255, 255, 0.2);
             }
 
             .mode:not(:last-child),
-            .speed:not(:last-child) {
+            .speed:not(:last-child),
+            .filter:not(:last-child) {
                 border-bottom: 1px solid white;
             }
 
@@ -426,6 +453,7 @@
         <div id="video-container">
             <div id="video-figure">
                 <video id="video" poster></video>
+                <div id="screen-filter-cover"></div>
                 <div id="video-controls">
                     <div id="video-controls-top">
                         Move cursor to extreme right to view playlist
@@ -473,6 +501,23 @@
                                 />
                             </span>
                             <i id="fullscreen" class="fas fa-arrows-alt"></i>
+                            <div id="screen-filter">
+                                <div id="current-filter">Bright Low</div>
+                                <div id="filter-options">
+                                    <p class="filter">Bright Low</p>
+                                    <p class="filter">Bright High</p>
+                                    <p class="filter">Contrast Low</p>
+                                    <p class="filter">Contrast High</p>
+                                    <p class="filter">Saturate Low</p>
+                                    <p class="filter">Saturate High</p>
+                                    <p class="filter">Hue Green</p>
+                                    <p class="filter">Hue Blue</p>
+                                    <p class="filter">Graysacle</p>
+                                    <p class="filter">Invert</p>
+                                    <p class="filter">Sepia</p>
+                                    <p class="filter">Blur</p>
+                                </div>
+                            </div>
                             <div id="playback-speed">
                                 <div id="current-speed">1x</div>
                                 <div id="speed-options">
@@ -657,11 +702,17 @@
                                 playNextItem();
                             }
                             break;
+                        case 66:
+                            toggleFilter();
+                            break;
                         case 70:
                             toggleFullscreen();
                             break;
                         case 77:
                             toggleMute();
+                            break;
+                        case 78:
+                            nextFilter();
                             break;
                         case 187:
                             highSpeed();
@@ -932,6 +983,96 @@
                 [...speedOptions].forEach(function (speed) {
                     speed.addEventListener("click", changeSpeed);
                 });
+
+                const screenFilterCover = document.getElementById("screen-filter-cover")
+                const currentFilter = document.getElementById("current-filter");
+                let currentFilterSwitch = 0;
+                currentFilter.style.textDecoration = "line-through";
+                const filterOptions = document.getElementsByClassName("filter");
+                function changeFilter(e) {
+                    const filter = e instanceof Event ? this.textContent : e;
+                    if (filter === "None") {
+                        currentFilterSwitch  = 0;
+                        currentFilter.style.textDecoration = "line-through";
+                        screenFilterCover.style.backgroundColor = "rgba(0,0,0,0)";
+                        screenFilterCover.style.backdropFilter = "none";
+                    } else {
+                        currentFilterSwitch  = 1;
+                        currentFilter.style.textDecoration = "none";
+                        currentFilter.textContent = filter;
+                        switch (filter) {
+                            case "Bright Low":
+                                screenFilterCover.style.backdropFilter = "brightness(50%)";
+                                break;
+                            case "Bright High":
+                                screenFilterCover.style.backdropFilter = "brightness(200%)";
+                                break;
+                            case "Contrast Low":
+                                screenFilterCover.style.backdropFilter = "contrast(50%)";
+                                break;
+                            case "Contrast High":
+                                screenFilterCover.style.backdropFilter = "contrast(200%)";
+                                break;
+                            case "Saturate Low":
+                                screenFilterCover.style.backdropFilter = "saturate(0.5)";
+                                break;
+                            case "Saturate High":
+                                screenFilterCover.style.backdropFilter = "saturate(2)";
+                                break;
+                            case "Hue Green":
+                                screenFilterCover.style.backdropFilter = "hue-rotate(120deg)";
+                                break;
+                            case "Hue Blue":
+                                screenFilterCover.style.backdropFilter = "hue-rotate(-120deg)";
+                                break;
+                            case "Graysacle":
+                                screenFilterCover.style.backdropFilter = "grayscale(1)";
+                                break;
+                            case "Invert":
+                                screenFilterCover.style.backdropFilter = "invert(1)";
+                                break;
+                            case "Sepia":
+                                screenFilterCover.style.backdropFilter = "sepia(1)";
+                                break;
+                            case "Blur":
+                                screenFilterCover.style.backdropFilter = "blur(5px)";
+                                break;
+                            default:
+                                break;
+                        }
+                            
+                    }
+                }
+                function toggleFilter() {
+                    if (currentFilterSwitch === 0) {
+                        changeFilter(currentFilter.textContent);
+                    } else {
+                        changeFilter("None");
+                    }
+                }
+                [...filterOptions].forEach(function (filter) {
+                    filter.addEventListener("click", changeFilter);
+                });
+                currentFilter.addEventListener("click", toggleFilter);
+                function nextFilter() {
+                    [...filterOptions].some(function (filter, ind) {
+                        if (
+                            filter.textContent === currentFilter.textContent
+                        ) {
+                            if (currentFilterSwitch === 0) {
+                                toggleFilter();
+                            } else {
+                                if (ind + 1 < filterOptions.length) {
+                                    filterOptions[ind + 1].click();
+                                } else {
+                                    filterOptions[0].click();
+                                }
+                            }
+                            return true;
+                        }
+                        return false;
+                    });
+                }
 
                 const urlInput = document.getElementById("url-input");
                 const addBtn = document.getElementById("add-btn");
