@@ -739,28 +739,35 @@
                 video.addEventListener("durationchange", function () {
                     videoDuration.innerHTML = timeFormat(video.duration);
                 });
-                video.addEventListener("timeupdate", function () {
+                function syncTimeAndSeekBar() {
                     currentTime.innerHTML = timeFormat(video.currentTime);
                     seekBar.value = (video.currentTime * 100) / video.duration;
-                });
+                }
+                video.addEventListener("timeupdate", syncTimeAndSeekBar);
 
                 const seekBar = document.getElementById("seek-bar");
                 seekBar.addEventListener("change", function () {
                     if (videoSource()) {
                         video.currentTime =
                             video.duration * (seekBar.value / 100);
+                        video.addEventListener("timeupdate", syncTimeAndSeekBar);
                     }
                 });
+                let videoPrevState;
                 seekBar.addEventListener("mousedown", function () {
                     if (videoSource()) {
+                        video.removeEventListener("timeupdate", syncTimeAndSeekBar);
+                        videoPrevState = video.paused ? "was paused" : "was playing";
                         video.pause();
                         activateBothPlayIcon();
                     }
                 });
                 seekBar.addEventListener("mouseup", function () {
                     if (videoSource()) {
-                        video.play();
-                        activateBothPauseIcon();
+                        if (videoPrevState === "was playing") {
+                            video.play();
+                            activateBothPauseIcon();
+                        }
                     } else {
                         seekBar.value = 0;
                     }
