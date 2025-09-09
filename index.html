@@ -214,6 +214,12 @@
                 margin-left: 15px;
             }
 
+            #screenshot {
+                font-size: 25px;
+                color: white;
+                cursor: pointer;
+            }
+
             #pitch-mode,
             #playback-speed,
             #screen-filter {
@@ -230,7 +236,6 @@
 
             #pitch-mode {
                 width: 120px;
-                margin-left: 0;
             }
 
             #current-mode,
@@ -472,6 +477,7 @@
                             <span id="video-duration"></span
                         ></span>
                         <span id="right-control">
+                            <i id="screenshot" class="fas fa-image"></i>
                             <div id="pitch-mode">
                                 <div id="current-mode">Smooth</div>
                                 <div id="mode-options">
@@ -719,6 +725,9 @@
                         case 78:
                             nextFilter();
                             break;
+                        case 83:
+                            takeScreenshot();
+                            break;
                         case 187:
                             highSpeed();
                             break;
@@ -951,6 +960,28 @@
                         "video-controls-bottom"
                     ).style.opacity = "0";
                 });
+
+                function takeScreenshot() {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+
+                    const context = canvas.getContext("2d");
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    const dataURL = canvas.toDataURL("image/png");
+                    const a = document.createElement("a");
+                    a.href = dataURL;
+                    a.download = `${controlsTop.innerHTML}-${timeFormat(
+                        video.currentTime
+                    )}.png`;
+                    a.click();
+                }
+                document
+                    .getElementById("screenshot")
+                    .addEventListener("click", function () {
+                        takeScreenshot();
+                    });
 
                 const currentSpeed = document.getElementById("current-speed");
                 const speedOptions = document.getElementsByClassName("speed");
